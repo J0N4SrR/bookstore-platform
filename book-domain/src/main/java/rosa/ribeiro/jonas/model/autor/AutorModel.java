@@ -1,7 +1,7 @@
-package rosa.ribeiro.jonas.autor;
+package rosa.ribeiro.jonas.model.autor;
 
 import jakarta.persistence.*;
-import rosa.ribeiro.jonas.livro.Livro;
+import rosa.ribeiro.jonas.model.livro.Livro;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name ="autores")
-public class Autor {
+public class AutorModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -21,9 +21,9 @@ public class Autor {
     @ManyToMany(mappedBy = "autores")
     private List<Livro> livros = new ArrayList<>();
 
-    protected Autor() {}
+    protected AutorModel() {}
 
-    public Autor(String nome, LocalDate dataNascimento, String nacionalidade) {
+    public AutorModel(String nome, LocalDate dataNascimento, String nacionalidade) {
         this.nome = nome;
         this.dataNascimento = dataNascimento;
         this.nacionalidade = nacionalidade;

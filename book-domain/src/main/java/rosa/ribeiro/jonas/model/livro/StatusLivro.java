@@ -1,4 +1,4 @@
-package rosa.ribeiro.jonas.livro;
+package rosa.ribeiro.jonas.model.livro;
 
 public enum StatusLivro {
     DISPONIVEL("disponivel"),

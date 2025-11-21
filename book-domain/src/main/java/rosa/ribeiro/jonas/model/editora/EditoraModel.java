@@ -1,14 +1,14 @@
-package rosa.ribeiro.jonas.editora;
+package rosa.ribeiro.jonas.model.editora;
 
 import jakarta.persistence.*;
-import rosa.ribeiro.jonas.livro.Livro;
+import rosa.ribeiro.jonas.model.livro.Livro;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "editoras")
-public class Editora {
+public class EditoraModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -24,9 +24,9 @@ public class Editora {
     @OneToMany(mappedBy = "editora")
     private List<Livro> livrosPublicados = new ArrayList<>();
 
-    protected Editora() {}
+    protected EditoraModel() {}
 
-    public Editora(String nome, String cnpj, String telefone, String email) {
+    public EditoraModel(String nome, String cnpj, String telefone, String email) {
         this.nome = nome;
         this.cnpj = cnpj;
         this.telefone = telefone;

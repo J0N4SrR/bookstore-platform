@@ -1,14 +1,14 @@
-package rosa.ribeiro.jonas.categoria;
+package rosa.ribeiro.jonas.model.categoria;
 
 import jakarta.persistence.*;
-import rosa.ribeiro.jonas.livro.Livro;
+import rosa.ribeiro.jonas.model.livro.Livro;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "categorias")
-public class Categoria {
+public class CategoriaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -20,9 +20,9 @@ public class Categoria {
     @ManyToMany(mappedBy = "categorias")
     private Set<Livro> livros = new HashSet<>();
 
-    protected Categoria() {}
+    protected CategoriaModel() {}
 
-    public Categoria(String nome) {
+    public CategoriaModel(String nome) {
         this.nome = nome;
     }
 
