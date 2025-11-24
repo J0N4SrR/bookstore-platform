@@ -51,6 +51,16 @@ public class ClienteController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Cliente> atualizar(@PathVariable String id, @RequestBody Cliente dadosNovos) {
+        try {
+            Cliente atualizado = service.atualizarCliente(id, dadosNovos);
+            return ResponseEntity.ok(atualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable String id) {
         try {

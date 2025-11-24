@@ -12,6 +12,7 @@ import rosa.ribeiro.jonas.customerdomain.service.ManterClienteService;
 import rosa.ribeiro.jonas.orderdomain.pagamento.Pagamento;
 import rosa.ribeiro.jonas.orderdomain.pedido.ItemPedido;
 import rosa.ribeiro.jonas.orderdomain.pedido.Pedido;
+import rosa.ribeiro.jonas.orderdomain.pedido.StatusPedido;
 import rosa.ribeiro.jonas.orderdomain.repository.PagamentoRepository;
 import rosa.ribeiro.jonas.orderdomain.repository.PedidoRepository;
 
@@ -53,6 +54,15 @@ public class EfetuarPedidoService {
         pagamentoRepository.save(pagamento);
 
         return pedido;
+    }
+
+    @Transactional
+    public Pedido atualizarStatus(String id, StatusPedido novoStatus) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado"));
+
+        pedido.atualizarStatus(novoStatus);
+        return pedidoRepository.save(pedido);
     }
 }
 

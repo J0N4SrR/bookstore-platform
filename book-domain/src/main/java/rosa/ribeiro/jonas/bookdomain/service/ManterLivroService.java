@@ -66,4 +66,18 @@ public class ManterLivroService {
         }
     }
 
+    @Transactional
+    public Livro atualizarLivro(String id, Livro dadosAtualizados) {
+        Livro livroExistente = buscarPorId(id);
+
+        livroExistente.setTitulo(dadosAtualizados.getTitulo());
+        livroExistente.setIsbn(dadosAtualizados.getIsbn());
+        livroExistente.setNumPaginas(dadosAtualizados.getNumPaginas());
+        livroExistente.setAnoPublicacao(dadosAtualizados.getAnoPublicacao());
+        livroExistente.setResumo(dadosAtualizados.getResumo());
+        livroExistente.setPrecoBase(dadosAtualizados.getPrecoBase());
+
+        return livroRepository.save(livroExistente);
+    }
+
 }

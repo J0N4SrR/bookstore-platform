@@ -2,8 +2,10 @@ package rosa.ribeiro.jonas.api.bookdomain.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rosa.ribeiro.jonas.orderdomain.dto.AtualizacaoStatusDTO;
 import rosa.ribeiro.jonas.orderdomain.dto.DadosPedidoDTO;
 import rosa.ribeiro.jonas.orderdomain.pedido.Pedido;
+import rosa.ribeiro.jonas.orderdomain.pedido.StatusPedido;
 import rosa.ribeiro.jonas.orderdomain.service.EfetuarPedidoService;
 import rosa.ribeiro.jonas.orderdomain.repository.PedidoRepository;
 
@@ -52,4 +54,17 @@ public class PedidoController {
         }
         return ResponseEntity.ok(pedidos);
     }
+
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Pedido> atualizarStatus(@PathVariable String id, @RequestBody AtualizacaoStatusDTO dto) {
+        try {
+            StatusPedido novoStatus = StatusPedido.valueOf(dto.status().toUpperCase());
+            Pedido atualizado = efetuarPedidoService.atualizarStatus(id, novoStatus); // Chame o serviço
+            return ResponseEntity.ok(atualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

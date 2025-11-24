@@ -60,4 +60,24 @@ public class Editora {
     public List<Livro> getLivrosPublicados() {
         return livrosPublicados;
     }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setLivrosPublicados(List<Livro> livrosPublicados) {
+        this.livrosPublicados = livrosPublicados;
+    }
 }

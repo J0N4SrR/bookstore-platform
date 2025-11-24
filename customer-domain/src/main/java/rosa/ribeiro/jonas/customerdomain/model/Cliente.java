@@ -74,4 +74,11 @@ public class Cliente {
     public List<Endereco> getEnderecos() {
         return enderecos;
     }
+
+    public void setNomeCompleto(String nomeCompleto) { this.nomeCompleto = nomeCompleto; }
+
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+
+    public void setEmail(String email) { this.email = email; }
+
 }

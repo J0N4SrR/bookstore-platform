@@ -56,4 +56,14 @@ public class ManterClienteService {
         }
         clienteRepository.deleteById(id);
     }
+
+    @Transactional
+    public Cliente atualizarCliente(String id, Cliente dadosNovos) {
+        Cliente cliente = buscarPorId(id);
+        cliente.setNomeCompleto(dadosNovos.getNomeCompleto());
+        cliente.setTelefone(dadosNovos.getTelefone());
+        return clienteRepository.save(cliente);
+    }
+
+
 }

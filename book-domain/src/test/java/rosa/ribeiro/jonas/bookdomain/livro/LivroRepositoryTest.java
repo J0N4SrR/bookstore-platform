@@ -76,5 +76,4 @@ public class LivroRepositoryTest {
         assertThat(encontrados).isNotEmpty();
         assertThat(encontrados.get(0).getTitulo()).isEqualTo("Harry Potter");
     }
-
 }

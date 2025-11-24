@@ -49,6 +49,17 @@ public class LivroController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Livro> atualizar(@PathVariable String id, @RequestBody LivroRequestDTO dto) {
+        try {
+            Livro dadosNovos = livroFactory.criarEntidade(dto);
+            Livro livroAtualizado = service.atualizarLivro(id, dadosNovos);
+            return ResponseEntity.ok(livroAtualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable String id) {
         try {

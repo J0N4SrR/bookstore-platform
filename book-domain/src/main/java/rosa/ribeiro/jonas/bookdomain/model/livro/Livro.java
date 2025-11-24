@@ -143,4 +143,17 @@ public abstract class Livro {
     public Set<Categoria> getCategorias() {
         return categorias;
     }
+
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public void setNumPaginas(int numPaginas) { this.numPaginas = numPaginas; }
+
+    public void setAnoPublicacao(int anoPublicacao) { this.anoPublicacao = anoPublicacao; }
+
+    public void setResumo(String resumo) { this.resumo = resumo; }
+
+    public void setPrecoBase(BigDecimal precoBase) { this.precoBase = precoBase; }
+
 }
