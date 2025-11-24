@@ -2,18 +2,18 @@ package rosa.ribeiro.jonas.orderdomain.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import rosa.ribeiro.jonas.model.livro.Livro;
-import rosa.ribeiro.jonas.orderdomain.dto.DadosItemDTO;
-import rosa.ribeiro.jonas.orderdomain.dto.DadosPedidoDTO;
-import rosa.ribeiro.jonas.service.ManterLivroService;
+import rosa.ribeiro.jonas.bookdomain.model.livro.Livro;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.dto.DadosItemDTO;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.dto.DadosPedidoDTO;
+import rosa.ribeiro.jonas.bookdomain.service.ManterLivroService;
 import rosa.ribeiro.jonas.customerdomain.model.Cliente;
 import rosa.ribeiro.jonas.customerdomain.service.ManterClienteService;
 
-import rosa.ribeiro.jonas.orderdomain.pagamento.Pagamento;
-import rosa.ribeiro.jonas.orderdomain.pedido.ItemPedido;
-import rosa.ribeiro.jonas.orderdomain.pedido.Pedido;
-import rosa.ribeiro.jonas.orderdomain.repository.PagamentoRepository;
-import rosa.ribeiro.jonas.orderdomain.repository.PedidoRepository;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pagamento.Pagamento;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pedido.ItemPedido;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pedido.Pedido;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.repository.PagamentoRepository;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.repository.PedidoRepository;
 
 @Service
 public class EfetuarPedidoService {

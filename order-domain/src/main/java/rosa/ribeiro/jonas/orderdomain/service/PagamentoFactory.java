@@ -1,11 +1,11 @@
 package rosa.ribeiro.jonas.orderdomain.service;
 
 import org.springframework.stereotype.Component;
-import rosa.ribeiro.jonas.orderdomain.dto.DadosPagamentoDTO;
-import rosa.ribeiro.jonas.orderdomain.pagamento.Pagamento;
-import rosa.ribeiro.jonas.orderdomain.pagamento.PagamentoCartao;
-import rosa.ribeiro.jonas.orderdomain.pagamento.PagamentoPix;
-import rosa.ribeiro.jonas.orderdomain.pedido.Pedido;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.dto.DadosPagamentoDTO;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pagamento.Pagamento;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pagamento.PagamentoCartao;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pagamento.PagamentoPix;
+import rosa.ribeiro.jonas.bookdomain.orderdomain.pedido.Pedido;
 
 @Component
 public class PagamentoFactory {
