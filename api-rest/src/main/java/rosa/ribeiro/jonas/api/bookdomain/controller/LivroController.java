@@ -69,5 +69,20 @@ public class LivroController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/pesquisa")
+    public ResponseEntity<List<Livro>> pesquisar(
+            @RequestParam(required = false) String titulo,
+            @RequestParam(required = false) String autor,
+            @RequestParam(required = false) String editora,
+            @RequestParam(required = false) String categoria) {
+
+        List<Livro> resultado = service.pesquisarLivros(titulo, autor, editora, categoria);
+
+        if (resultado.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(resultado);
+    }
 }
 

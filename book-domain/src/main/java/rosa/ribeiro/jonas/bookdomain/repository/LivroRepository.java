@@ -18,6 +18,12 @@ public interface LivroRepository extends JpaRepository<Livro, String> {
     Optional<Livro> findByIsbn(String isbn);
     List<Livro> findByStatus(StatusLivro status);
 
+    List<Livro> findByAutoresNomeContainingIgnoreCase(String nomeAutor);
+
+    List<Livro> findByEditoraNomeContainingIgnoreCase(String nomeEditora);
+
+    List<Livro> findByCategoriasNomeContainingIgnoreCase(String nomeCategoria);
+
     @Query("SELECT l FROM Livro l WHERE l.quantidadeEstoque <= :limite AND l.status = 'DISPONIVEL'")
     List<Livro> findLivrosComEstoqueBaixo(@Param("limite") int limite);
 

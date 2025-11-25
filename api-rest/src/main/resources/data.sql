@@ -1,10 +1,14 @@
 -- ==================================================================================
+-- 0. FUNCIONARIO - exigencia do CSU01
+-- ==================================================================================
+INSERT INTO funcionarios (id, nome, matricula) VALUES (UUID(), 'Administrador Livraria', 'FUNC-001');
+-- ==================================================================================
 -- 1. CLIENTES
 -- ==================================================================================
 INSERT INTO clientes (id, nome_completo, cpf, email, data_nascimento, telefone, senha) VALUES
-(UUID(), 'Bruce Wayne', '444.555.666-77', 'bruce@wayne.com', '1972-02-19', '11999990004', 'batman'),
-(UUID(), 'Diana Prince', '555.666.777-88', 'diana@themyscira.com', '1900-03-22', '11999990005', 'wonder'),
-(UUID(), 'Clark Kent', '666.777.888-99', 'clark@dailyplanet.com', '1985-06-18', '11999990006', 'krypton'),
+('cli-001', 'Bruce Wayne', '444.555.666-77', 'bruce@wayne.com', '1972-02-19', '11999990004', 'batman'),
+('cli-002', 'Diana Prince', '555.666.777-88', 'diana@themyscira.com', '1900-03-22', '11999990005', 'wonder'),
+('cli-003', 'Clark Kent', '666.777.888-99', 'clark@dailyplanet.com', '1985-06-18', '11999990006', 'krypton'),
 (UUID(), 'Natasha Romanoff', '777.888.999-00', 'natasha@shield.gov', '1984-11-22', '11999990007', 'widow'),
 (UUID(), 'Peter Parker', '888.999.000-11', 'peter@midtown.edu', '2001-08-10', '11999990008', 'spidey'),
 (UUID(), 'Wanda Maximoff', '999.000.111-22', 'wanda@vision.com', '1989-02-10', '11999990009', 'chaos'),
@@ -13,6 +17,18 @@ INSERT INTO clientes (id, nome_completo, cpf, email, data_nascimento, telefone, 
 (UUID(), 'Carol Danvers', '234.567.890-11', 'carol@force.mil', '1965-04-24', '11999990012', 'marvel'),
 (UUID(), 'Scott Lang', '345.678.901-22', 'scott@pym.tech', '1969-04-06', '11999990013', 'antman');
 
+-- ==================================================================================
+-- 1.1 ENDEREÇOS (Vinculados aos Clientes)
+-- ==================================================================================
+
+INSERT INTO enderecos (id, rua, numero, complemento, bairro, cidade, estado, cep, cliente_id) VALUES
+('end-001', 'Rua da Caverna', '100', 'Subsolo', 'Mansão Wayne', 'São Paulo', 'SP', '01001-000', 'cli-001');
+
+INSERT INTO enderecos (id, rua, numero, complemento, bairro, cidade, estado, cep, cliente_id) VALUES
+('end-002', 'Av. das Amazonas', '500', 'Ilha', 'Paraíso', 'Rio de Janeiro', 'RJ', '20000-000', 'cli-002');
+
+INSERT INTO enderecos (id, rua, numero, complemento, bairro, cidade, estado, cep, cliente_id) VALUES
+('end-003', 'Rua do Planeta', '1', 'Redação', 'Centro', 'Porto Alegre', 'RS', '90000-000', 'cli-003');
 
 -- ==================================================================================
 -- 2. EDITORAS
