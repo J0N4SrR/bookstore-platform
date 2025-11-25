@@ -23,6 +23,9 @@ public class Pedido {
     private StatusPedido status;
 
     private BigDecimal valorTotal = BigDecimal.ZERO;
+    private BigDecimal valorFrete;
+    private Integer prazoEntregaDias;
+    private String enderecoEntregaSnapshot;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
@@ -46,10 +49,20 @@ public class Pedido {
         calcularValorTotal();
     }
 
+    public void definirFrete(BigDecimal valor, Integer dias, String cep) {
+        this.valorFrete = valor;
+        this.prazoEntregaDias = dias;
+        this.enderecoEntregaSnapshot = cep;
+    }
+
     public void calcularValorTotal() {
-        this.valorTotal = itens.stream()
+        BigDecimal subtotalItens = itens.stream()
                 .map(ItemPedido::calcularSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal frete = (valorFrete != null) ? valorFrete : BigDecimal.ZERO;
+
+        this.valorTotal = subtotalItens.add(frete);
     }
 
     public void atualizarStatus(StatusPedido novoStatus) {
@@ -63,4 +76,5 @@ public class Pedido {
     public BigDecimal getValorTotal() { return valorTotal; }
     public Cliente getCliente() { return cliente; }
     public List<ItemPedido> getItens() { return itens; }
+    public BigDecimal getValorFrete() { return valorFrete; }
 }
