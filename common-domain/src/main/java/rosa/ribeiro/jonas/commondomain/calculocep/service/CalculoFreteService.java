@@ -16,8 +16,8 @@ public class CalculoFreteService {
     private static final Set<String> SUDESTE = Set.of("SP", "RJ", "MG", "ES");
     private static final Set<String> SUL = Set.of("PR", "SC", "RS");
 
-    public CalculoFreteService() {
-        this.restTemplate = new RestTemplate();
+    public CalculoFreteService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     public BigDecimal calcularFrete(String cepDestino) {
