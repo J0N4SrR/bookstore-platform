@@ -34,6 +34,7 @@ bookstore-platform/
 -   **Linguagem:** Java 17
 -   **Framework:** Spring Boot 3.1.5
 -   **Persistência:** Spring Data JPA / Hibernate
+-   **Web Server / Load Balancer:** NGINX
 -   **Banco de Dados:**
     -   *Produção:* MySQL 8.0 (Driver 8.4.0)
     -   *Testes:* H2 Database (Em memória)
@@ -42,7 +43,7 @@ bookstore-platform/
     - *MailHog:* Ambiente local para captura e inspeção de e-mails enviados. 
     - *Spring Mail:* Estrutura configurada para envio de notificações, como alertas de estoque.
 
--   **Testes:** JUnit 5 (Jupiter), Mockito, AssertJ
+-   **Testes:** JUnit 5 (Jupiter), Mockito, AssertJ, JMeter (Performance) 
 -   **Build:** Maven
 -   **Documentação:** SpringDoc OpenAPI (Swagger UI)
 
@@ -97,6 +98,14 @@ Expõe os serviços de domínio para o mundo externo via HTTP.
     `LivroRequestDTO`, `DadosPedidoDTO`).
 -   **Configuração:** Conexão com MySQL e carga inicial de dados
     (`data.sql`).
+    
+### 5.📦 Infraestrutura (Docker Cluster)
+
+O ambiente de produção opera em um cluster containerizado utilizando **Docker Compose**:
+
+- **Load Balancer:** NGINX (porta **8000**) distribuindo requisições entre as instâncias da API.  
+- **Aplicação:** 2 réplicas da API (`api1`, `api2`) rodando **Spring Boot**.  
+- **Banco de Dados:** MySQL 8.0 com persistência de dados.  
 
 ------------------------------------------------------------------------
 
@@ -118,7 +127,7 @@ Expõe os serviços de domínio para o mundo externo via HTTP.
 -   ✅ API RESTful completa.
 -   ✅ CRUDs implementados para 4 entidades principais.
 -   ✅ Relacionamentos 1:N e N:N mapeados com JPA.
--   ⏳ **Pendente:** Configuração NGINX e Testes de Carga (JMeter).
+-   ✅ Configuração NGINX e Testes de Carga (JMeter).
 
 ### 🔶 QSW -- Qualidade de Software
 
@@ -128,62 +137,108 @@ Expõe os serviços de domínio para o mundo externo via HTTP.
     de Exceção.
 -   ✅ Cobertura de testes automatizados (JUnit + Mockito).
 
+### 🔶 BRADECO / BRADWBK / QSW
+Todos os requisitos foram concluídos:
+- Módulos  
+- CRUDs  
+- Relacionamentos  
+- Testes de unidade  
+- Infraestrutura com **Load Balancer NGINX** e múltiplas réplicas da API  
+
+
 ------------------------------------------------------------------------
 
 ## 🏗️ Como Executar o Projeto
 
-### Pré-requisitos
+> **Importante:** A arquitetura final exige Docker.\
+> Desinstale ou pare qualquer MySQL/NGINX/Apache local para evitar
+> conflitos de porta.
 
--   Java 17+
--   Maven 3.8+
--   MySQL rodando na porta 3306 (com banco `bookstore_db` criado).
+### ✅ Pré-requisitos
 
-### 1. Compilar e Instalar os Módulos
-
-Na raiz do projeto (`bookstore-platform`), execute:
-
-``` bash
-mvn clean install -DskipTests
-```
-
-### 2. Configurar Variáveis de Ambiente
-
--   `DB_PASSWORD`: Sua senha do MySQL.
-
-### 3. Rodar a API
-
-``` bash
-
-cd api-rest
-
-mvn spring-boot:run
-
-```
-
-A aplicação subirá na porta **8081**.
-
-### 4. Acessar Documentação (Swagger)
-
-👉 http://localhost:8081/swagger-ui.html
+-   Java **17+**\
+-   Maven **3.8+**\
+-   Docker + Docker Compose
 
 ------------------------------------------------------------------------
 
-## 🧪 Como Rodar os Testes
+### 1. Gerar o Executável (.jar)
+
+Na raiz do projeto:
 
 ``` bash
-
-mvn test
-
-```
-
-Ou para um módulo específico:
-
-``` bash
-
-cd book-domain
-
-mvn test
-
+mvn clean package -DskipTests
 ```
 
 ------------------------------------------------------------------------
+
+### 2. Subir o Ambiente Clusterizado
+
+Execute:
+
+``` bash
+sudo docker-compose up --build
+```
+
+Componentes iniciados: - `banco`\
+- `api1`\
+- `api2`\
+- `nginx`
+
+------------------------------------------------------------------------
+
+### 3. Acessar a Aplicação
+
+Entrada única via **NGINX (porta 8000)**:
+
+📘 **Swagger UI:**\
+👉 http://localhost:8000/swagger-ui.html
+
+#### Exemplos de Endpoints:
+
+  Método   Endpoint         Descrição
+  -------- ---------------- ---------------
+  GET      `/api/livros`    Listar livros
+  POST     `/api/pedidos`   Criar pedido
+
+------------------------------------------------------------------------
+
+## 🧪 Testes de Carga (JMeter)
+
+1.  Abra o **Apache JMeter**\
+
+2.  Configure:
+
+        Host: localhost
+        Porta: 8000
+        Path: /api/livros
+
+3.  Execute o teste\
+
+4.  Gere:
+
+    -   *Summary Report*\
+    -   *Graph Results*
+
+------------------------------------------------------------------------
+
+## 🛠️ Comandos Úteis
+
+### Parar os containers:
+
+``` bash
+sudo docker-compose down
+```
+
+### Reset total (remove banco de dados):
+
+``` bash
+sudo docker-compose down -v
+```
+
+### Ver status:
+
+``` bash
+sudo docker-compose ps
+```
+

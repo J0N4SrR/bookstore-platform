@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  banco:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bookstore_db
+    ports:
+      - "3307:3306"
+
+  api1:
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://banco:3306/bookstore_db?useSSL=false&allowPublicKeyRetrieval=true
+      DB_PASSWORD: root
+    depends_on:
+      - banco
+
+  api2:
+    build: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://banco:3306/bookstore_db?useSSL=false&allowPublicKeyRetrieval=true
+      DB_PASSWORD: root
+    depends_on:
+      - banco
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8000:80"
+    depends_on:
+      - api1
+      - api2
