@@ -57,9 +57,8 @@ Etapas:
 2. Se não cadastrado, deve preencher seus dados pessoais.
 3. Cliente informa endereço para cálculo do frete.
 4. Seleciona forma de pagamento (cartão ou Pix).
-5. Pedido é finalizado:
-   - estoque é atualizado,
-   - carrinho é esvaziado.
+5. Pedido é finalizado
+   - estoque é atualizado
 
 Inclusões:
 - **Atualizar Estoque**

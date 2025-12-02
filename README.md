@@ -39,13 +39,13 @@ bookstore-platform/
     -   *Produção:* MySQL 8.0 (Driver 8.4.0)
     -   *Testes:* H2 Database (Em memória)
 -   **Serviços e Integrações Externas**
-    - *ViaCEP:* Utilizado para consulta de endereços e cálculo lógico de frete por região. 
-    - *MailHog:* Ambiente local para captura e inspeção de e-mails enviados. 
-    - *Spring Mail:* Estrutura configurada para envio de notificações, como alertas de estoque.
+    - *ViaCEP:* Integração via RestTemplate com headers personalizados (User-Agent) para cálculo de frete por região. 
+    - *MailHog:* Ambiente local para captura e inspeção de e-mails enviados.
+    - *Spring Mail:* Estrutura configurada para envio de notificações assíncronas (alertas de estoque).
 
--   **Testes:** JUnit 5 (Jupiter), Mockito, AssertJ, JMeter (Performance) 
+-   **Testes:** JUnit 5 (Jupiter), Mockito (estratégias lenient), AssertJ, JMeter (Performance).
 -   **Build:** Maven
--   **Documentação:** SpringDoc OpenAPI (Swagger UI)
+-   **Documentação:** SpringDoc OpenAPI (Swagger UI) e PlantUML.
 
 ------------------------------------------------------------------------
 
@@ -130,12 +130,17 @@ O ambiente de produção opera em um cluster containerizado utilizando **Docker 
 -   ✅ Configuração NGINX e Testes de Carga (JMeter).
 
 ### 🔶 QSW -- Qualidade de Software
+- ✅ Testes Unitários de Serviço: Cobertura completa de EfetuarPedidoService com JUnit 5 e Mockito.
 
--   ✅ Testes de Unidade (Regras de Negócio e Fluxo).
--   ✅ Testes de Integração (Repositórios e Queries).
--   ✅ Uso de Técnicas: Partição de Equivalência, Valor Limite e Caminho
-    de Exceção.
--   ✅ Cobertura de testes automatizados (JUnit + Mockito).
+- CT01: Fluxo Principal (Pix + Frete).
+- CT02/03: Fluxos Alternativos (Cartão Parcelado/À vista).
+- CT04: Exceção de Segurança (Cliente Inexistente).
+- CT05: Validação de Dados (CEP inválido).
+- CT06/07: Regras de Negócio (Livro Inexistente ou Sem Estoque/Indisponível).
+
+✅ Testes de Integração.
+
+✅ Diagramas de Classes gerados via Engenharia Reversa.
 
 ### 🔶 BRADECO / BRADWBK / QSW
 Todos os requisitos foram concluídos:
