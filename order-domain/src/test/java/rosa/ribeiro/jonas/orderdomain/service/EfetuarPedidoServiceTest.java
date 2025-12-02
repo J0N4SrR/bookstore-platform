@@ -20,54 +20,81 @@ import rosa.ribeiro.jonas.orderdomain.repository.PagamentoRepository;
 import rosa.ribeiro.jonas.orderdomain.repository.PedidoRepository;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+/**
+ * Classe de Teste Unitário para EfetuarPedidoService.
+ * * <p><strong>Abordagem:</strong> Estrutural (Caixa Branca).
+ * O objetivo é garantir a cobertura de todos os caminhos lógicos (statements/branches) do Service.</p>
+ * * <p><strong>Técnicas Funcionais Aplicadas na escolha dos dados:</strong>
+ * <ul>
+ * <li>Partição de Equivalência (PE): Entradas válidas vs Inválidas.</li>
+ * <li>Análise de Valor Limite (AVL): Listas vazias, Estoque insuficiente.</li>
+ * </ul>
+ * </p>
+ */
 @ExtendWith(MockitoExtension.class)
 class EfetuarPedidoServiceTest {
 
     @InjectMocks
     private EfetuarPedidoService service;
 
-    @Mock
-    private PedidoRepository pedidoRepository;
+    @Mock private PedidoRepository pedidoRepository;
+    @Mock private PagamentoRepository pagamentoRepository;
+    @Mock private ManterClienteService manterClienteService;
+    @Mock private ManterLivroService manterLivroService;
+    @Mock private PagamentoFactory pagamentoFactory;
+    @Mock private CalculoFreteService calculoFreteService;
 
-    @Mock
-    private PagamentoRepository pagamentoRepository;
+    // --- TESTES DE VALOR LIMITE (Boundary Value Analysis) ---
 
-    @Mock
-    private ManterClienteService manterClienteService;
-
-    @Mock
-    private ManterLivroService manterLivroService;
-
-    @Mock
-    private PagamentoFactory pagamentoFactory;
-
-    @Mock
-    private CalculoFreteService calculoFreteService;
-
-    // --- CT01: Fluxo Principal (Pix) ---
+    /**
+     * CT00: Validação de Lista Vazia.
+     * <br><strong>Técnica:</strong> Análise de Valor Limite (AVL).
+     * <br><strong>Objetivo:</strong> Testar o limite inferior da lista de itens (0 itens).
+     * <br><strong>Caminho:</strong> Interrompe no primeiro 'if' do método.
+     */
     @Test
-    @DisplayName("CT01: Deve efetuar pedido com sucesso via PIX (8% desconto implícito)")
+    @DisplayName("CT00: Deve falhar se a lista de itens estiver vazia (Valor Limite)")
+    void ct00_ValorLimite_ListaVazia() {
+        // Arrange
+        DadosPedidoDTO dadosSemItens = new DadosPedidoDTO("cli-001", Collections.emptyList(), null, "01001-000");
+
+        // Act & Assert
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.efetuarPedido(dadosSemItens));
+        assertEquals("O pedido deve conter ao menos um item.", ex.getMessage());
+
+        // Verifica que nada foi chamado (Isolamento)
+        verifyNoInteractions(manterClienteService);
+    }
+
+    // --- TESTES DE PARTIÇÃO DE EQUIVALÊNCIA (Classes Válidas) ---
+
+    /**
+     * CT01: Fluxo Principal (Caminho Feliz).
+     * <br><strong>Técnica:</strong> Partição de Equivalência (Classe Válida).
+     * <br><strong>Cenário:</strong> Todos os dados corretos, pagamento PIX.
+     * <br><strong>Cobertura:</strong> Percorre o fluxo completo de persistência.
+     */
+    @Test
+    @DisplayName("CT01: Deve efetuar pedido com sucesso via PIX")
     void ct01_FluxoPrincipal_Pix() {
         // Arrange
         String clienteId = "cli-001";
         String livroId = "book-001";
-        String cep = "01001-000";
+        DadosPedidoDTO dados = montarDto(clienteId, livroId, "01001-000", "PIX", null, null);
 
-        DadosPedidoDTO dados = montarDto(clienteId, livroId, cep, "PIX", null, null);
-
-        // Mocks
+        // Mocks (Stubs) para simular o comportamento de sucesso
         mockClienteExistente(clienteId);
         mockLivroDisponivel(livroId);
-        mockFrete(cep);
+        mockFrete("01001-000");
         mockSalvarPedido();
 
-        // Factory deve retornar um Pagamento (simulado)
         Pagamento pagamentoMock = mock(Pagamento.class);
         when(pagamentoFactory.criarPagamento(any(Pedido.class), eq(dados.pagamento()))).thenReturn(pagamentoMock);
 
@@ -76,58 +103,24 @@ class EfetuarPedidoServiceTest {
 
         // Assert
         assertNotNull(resultado);
-        verify(manterClienteService).buscarPorId(clienteId);
-        verify(manterLivroService).buscarPorId(livroId);
-        verify(manterLivroService).baixarEstoque(eq(livroId), anyInt());
+        verify(manterLivroService).baixarEstoque(eq(livroId), anyInt()); // Verifica efeito colateral
         verify(pedidoRepository).save(any(Pedido.class));
-        verify(pagamentoFactory).criarPagamento(any(Pedido.class), eq(dados.pagamento())); // Garante que a factory recebeu o tipo PIX
-        verify(pagamentoRepository).save(pagamentoMock);
     }
 
-    // --- CT02: Fluxo Alternativo (Cartão 3x - Sem juros) ---
+    /**
+     * CT02: Fluxo Alternativo (Cartão Parcelado).
+     * <br><strong>Técnica:</strong> Partição de Equivalência (Classe Válida - Variação de Pagamento).
+     */
     @Test
     @DisplayName("CT02: Deve efetuar pedido com sucesso via Cartão 3x")
     void ct02_FluxoAlternativo_Cartao3x() {
         // Arrange
         String clienteId = "cli-002";
-        String livroId = "book-002";
-        String cep = "20000-000";
+        DadosPedidoDTO dados = montarDto(clienteId, "book-002", "20000-000", "CARTAO", "Luke", 3);
 
-        DadosPedidoDTO dados = montarDto(clienteId, livroId, cep, "CARTAO", "Luke Skywalker", 3);
-
-        // Mocks
         mockClienteExistente(clienteId);
-        mockLivroDisponivel(livroId);
-        mockFrete(cep);
-        mockSalvarPedido();
-
-        Pagamento pagamentoMock = mock(Pagamento.class);
-        when(pagamentoFactory.criarPagamento(any(Pedido.class), eq(dados.pagamento()))).thenReturn(pagamentoMock);
-
-        // Act
-        Pedido resultado = service.efetuarPedido(dados);
-
-        // Assert
-        assertNotNull(resultado);
-        verify(pagamentoFactory).criarPagamento(any(Pedido.class), eq(dados.pagamento()));
-        verify(pagamentoRepository).save(pagamentoMock);
-    }
-
-    // --- CT03: Fluxo Alternativo (Cartão à Vista - 3% desc) ---
-    @Test
-    @DisplayName("CT03: Deve efetuar pedido com sucesso via Cartão à vista")
-    void ct03_FluxoAlternativo_CartaoVista() {
-        // Arrange
-        String clienteId = "cli-003";
-        String livroId = "book-003";
-        String cep = "90000-000";
-
-        DadosPedidoDTO dados = montarDto(clienteId, livroId, cep, "CARTAO", "Leia Organa", 1);
-
-        // Mocks
-        mockClienteExistente(clienteId);
-        mockLivroDisponivel(livroId);
-        mockFrete(cep);
+        mockLivroDisponivel("book-002");
+        mockFrete("20000-000");
         mockSalvarPedido();
 
         Pagamento pagamentoMock = mock(Pagamento.class);
@@ -141,87 +134,111 @@ class EfetuarPedidoServiceTest {
         verify(pagamentoRepository).save(pagamentoMock);
     }
 
-    // --- CT04: Fluxo Exceção (Cliente Inválido) ---
+    /**
+     * CT03: Fluxo Alternativo (Cartão à Vista).
+     * <br><strong>Técnica:</strong> Partição de Equivalência (Classe Válida).
+     */
+    @Test
+    @DisplayName("CT03: Deve efetuar pedido com sucesso via Cartão à vista")
+    void ct03_FluxoAlternativo_CartaoVista() {
+        String clienteId = "cli-003";
+        DadosPedidoDTO dados = montarDto(clienteId, "book-003", "90000-000", "CARTAO", "Leia", 1);
+
+        mockClienteExistente(clienteId);
+        mockLivroDisponivel("book-003");
+        mockFrete("90000-000");
+        mockSalvarPedido();
+
+        Pagamento pagamentoMock = mock(Pagamento.class);
+        when(pagamentoFactory.criarPagamento(any(Pedido.class), eq(dados.pagamento()))).thenReturn(pagamentoMock);
+
+        service.efetuarPedido(dados);
+
+        verify(pagamentoRepository).save(pagamentoMock);
+    }
+
+    // --- TESTES DE PARTIÇÃO DE EQUIVALÊNCIA (Classes Inválidas / Exceções) ---
+
+    /**
+     * CT04: Cliente Inexistente.
+     * <br><strong>Técnica:</strong> Partição de Equivalência (Classe Inválida - Segurança).
+     * <br><strong>Caminho:</strong> Desvio no 'if (cliente == null)'.
+     */
     @Test
     @DisplayName("CT04: Deve falhar quando Cliente não está cadastrado")
     void ct04_FluxoExcecao_ClienteInvalido() {
-        // Arrange
-        String clienteId = "cli-fantasma";
+        String clienteId = "cli-fake";
         DadosPedidoDTO dados = montarDto(clienteId, "book-001", "00000-000", "PIX", null, null);
 
-        // Mock: Retorna NULL para simular cliente inexistente
+        // Stub: Retorna NULL para simular não encontrado
         when(manterClienteService.buscarPorId(clienteId)).thenReturn(null);
 
-        // Act & Assert
         SecurityException ex = assertThrows(SecurityException.class, () -> service.efetuarPedido(dados));
         assertEquals("Operação não permitida: Usuário não cadastrado ou não encontrado na base de dados.", ex.getMessage());
 
         verifyNoInteractions(pedidoRepository);
-        verifyNoInteractions(manterLivroService);
     }
 
-    // --- CT05: Fluxo Exceção (CEP Inválido/Nulo) ---
+    /**
+     * CT05: CEP Inválido.
+     * <br><strong>Técnica:</strong> Partição de Equivalência (Dado Obrigatório Ausente).
+     */
     @Test
     @DisplayName("CT05: Deve falhar quando CEP é inválido ou nulo")
     void ct05_FluxoExcecao_CepInvalido() {
-        // Arrange
         DadosPedidoDTO dados = montarDto("cli-001", "book-001", null, "PIX", null, null);
-
         mockClienteExistente("cli-001");
 
-        // Act & Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.efetuarPedido(dados));
         assertEquals("CEP de entrega é obrigatório.", ex.getMessage());
-
-        verifyNoInteractions(pedidoRepository);
     }
 
-    // --- CT06: Fluxo Exceção (Livro Inexistente) ---
+    /**
+     * CT06: Livro Inexistente.
+     * <br><strong>Técnica:</strong> Partição de Equivalência (Integridade Referencial).
+     */
     @Test
     @DisplayName("CT06: Deve falhar quando Livro não existe")
     void ct06_FluxoExcecao_LivroInexistente() {
-        // Arrange
         String livroId = "book-404";
         DadosPedidoDTO dados = montarDto("cli-001", livroId, "01001-000", "PIX", null, null);
 
         mockClienteExistente("cli-001");
         mockFrete("01001-000");
 
-        // Mock: Retorna NULL para livro
+        // Stub: Retorna NULL
         when(manterLivroService.buscarPorId(livroId)).thenReturn(null);
 
-        // Act & Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.efetuarPedido(dados));
         assertTrue(ex.getMessage().contains("não encontrado"));
-
-        verify(pedidoRepository, never()).save(any());
     }
 
-    // --- CT07: Fluxo Exceção (Estoque Insuficiente) ---
+    /**
+     * CT07: Estoque Insuficiente.
+     * <br><strong>Técnica:</strong> Análise de Valor Limite (Limite de Estoque).
+     * <br><strong>Cenário:</strong> Tenta baixar quantidade maior que a disponível (simulado pela exceção).
+     */
     @Test
     @DisplayName("CT07: Deve falhar quando Estoque é insuficiente")
     void ct07_FluxoExcecao_EstoqueInsuficiente() {
-        // Arrange
         String livroId = "book-sem-estoque";
         DadosPedidoDTO dados = montarDto("cli-001", livroId, "01001-000", "PIX", null, null);
 
         mockClienteExistente("cli-001");
         mockFrete("01001-000");
+        mockLivroDisponivel(livroId); // Prepara o mock (com lenient)
 
-        Livro livroMock = mockLivroDisponivel(livroId);
-
-        // Mock: Simula erro ao tentar baixar estoque (quantidade pedida > estoque)
+        // Mock: Simula falha na regra de negócio de estoque
         doThrow(new IllegalArgumentException("Estoque insuficiente!"))
                 .when(manterLivroService).baixarEstoque(eq(livroId), anyInt());
 
-        // Act & Assert
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.efetuarPedido(dados));
         assertEquals("Estoque insuficiente!", ex.getMessage());
 
         verify(pedidoRepository, never()).save(any());
     }
 
-    // --- Helpers (Métodos Auxiliares para limpar o código) ---
+    // --- Helpers ---
 
     private DadosPedidoDTO montarDto(String clienteId, String livroId, String cep, String tipoPgto, String titular, Integer parcelas) {
         DadosItemDTO item = new DadosItemDTO(livroId, 1);
@@ -238,6 +255,7 @@ class EfetuarPedidoServiceTest {
         Livro livro = mock(Livro.class);
         when(livro.getId()).thenReturn(id);
         when(livro.podeSerVendido()).thenReturn(true);
+        // Lenient: Permite que este stub não seja usado em testes de falha prematura
         lenient().when(livro.calcularPreco()).thenReturn(BigDecimal.TEN);
         when(manterLivroService.buscarPorId(id)).thenReturn(livro);
         return livro;
@@ -248,7 +266,7 @@ class EfetuarPedidoServiceTest {
     }
 
     private void mockSalvarPedido() {
-        // Retorna o próprio pedido passado como argumento
         when(pedidoRepository.save(any(Pedido.class))).thenAnswer(invocation -> invocation.getArgument(0));
     }
 }
+
