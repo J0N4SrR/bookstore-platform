@@ -49,11 +49,6 @@ public class EfetuarPedidoService {
         }
 
         Cliente cliente = manterClienteService.buscarPorId(dados.clienteId());
-
-        if (cliente == null) {
-            throw new SecurityException("Operação não permitida: Usuário não cadastrado ou não encontrado na base de dados.");
-        }
-
         Pedido pedido = new Pedido(cliente);
 
         if (dados.cepEntrega() == null || dados.cepEntrega().isBlank()) {
@@ -66,24 +61,11 @@ public class EfetuarPedidoService {
 
         for (DadosItemDTO itemDTO : dados.itens()) {
             Livro livro = manterLivroService.buscarPorId(itemDTO.livroId());
-
-            // Validação se o livro existe no banco
-            if (livro == null) {
-                throw new IllegalArgumentException("Livro com ID " + itemDTO.livroId() + " não encontrado.");
-            }
-
-            if (!livro.podeSerVendido()) {
-                throw new IllegalStateException(
-                        String.format("O livro '%s' não está disponível para venda. (Status: %s)",
-                                livro.getTitulo(), livro.getStatus().getDescricao())
-                );
-            }
             manterLivroService.baixarEstoque(livro.getId(), itemDTO.quantidade());
-
-            pedido.adicionarItem(new ItemPedido(livro, itemDTO.quantidade()));
-        }
+            pedido.adicionarItem(new ItemPedido(livro, itemDTO.quantidade()));        }
 
         pedido.calcularValorTotal();
+
         pedido = pedidoRepository.save(pedido);
 
         Pagamento pagamento = pagamentoFactory.criarPagamento(pedido, dados.pagamento());

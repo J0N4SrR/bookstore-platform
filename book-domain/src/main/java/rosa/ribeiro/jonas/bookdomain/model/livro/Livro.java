@@ -69,10 +69,6 @@ public abstract class Livro {
 
     public abstract BigDecimal calcularPreco();
 
-    public boolean podeSerVendido() {
-        return StatusLivro.DISPONIVEL.equals(this.status) && this.quantidadeEstoque > 0;
-    }
-
     public void decrementarEstoque(int quantidade) {
         if(quantidadeEstoque < quantidade){
             throw new IllegalArgumentException("Não há quantidade suficiente no estoque!");

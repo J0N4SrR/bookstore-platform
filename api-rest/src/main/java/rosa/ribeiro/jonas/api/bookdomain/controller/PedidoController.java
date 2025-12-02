@@ -1,6 +1,5 @@
 package rosa.ribeiro.jonas.api.bookdomain.controller;
 
-import org.springframework.http.HttpStatus; // Importe o HttpStatus
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rosa.ribeiro.jonas.orderdomain.dto.AtualizacaoStatusDTO;
@@ -26,22 +25,12 @@ public class PedidoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody DadosPedidoDTO dados) {
+    public ResponseEntity<Pedido> criar(@RequestBody DadosPedidoDTO dados) {
         try {
             Pedido pedidoSalvo = efetuarPedidoService.efetuarPedido(dados);
             return ResponseEntity.created(URI.create("/api/pedidos/" + pedidoSalvo.getId())).body(pedidoSalvo);
-
-        } catch (SecurityException e) {
-            // Captura o erro de Usuário Inexistente e retorna 403 Forbidden com a mensagem
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-
-        } catch (IllegalStateException e) {
-            // Captura a RN01 (Livro Indisponível) e retorna 409 Conflict com a mensagem
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-
         } catch (IllegalArgumentException e) {
-            // Captura erros de validação básica (Dados nulos) e retorna 400 Bad Request
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -66,14 +55,16 @@ public class PedidoController {
         return ResponseEntity.ok(pedidos);
     }
 
+
     @PatchMapping("/{id}/status")
-    public ResponseEntity<?> atualizarStatus(@PathVariable String id, @RequestBody AtualizacaoStatusDTO dto) {
+    public ResponseEntity<Pedido> atualizarStatus(@PathVariable String id, @RequestBody AtualizacaoStatusDTO dto) {
         try {
             StatusPedido novoStatus = StatusPedido.valueOf(dto.status().toUpperCase());
-            Pedido atualizado = efetuarPedidoService.atualizarStatus(id, novoStatus);
+            Pedido atualizado = efetuarPedidoService.atualizarStatus(id, novoStatus); // Chame o serviço
             return ResponseEntity.ok(atualizado);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
+
 }
