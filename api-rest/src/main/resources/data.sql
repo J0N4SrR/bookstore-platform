@@ -88,11 +88,11 @@ INSERT INTO livros (id, tipo_livro, titulo, isbn, num_paginas, ano_publicacao, r
 
 -- 2. 1984 (Brochura)
 INSERT INTO livros (id, tipo_livro, titulo, isbn, num_paginas, ano_publicacao, resumo, quantidade_estoque, preco_base, status, editora_id) VALUES
-('book-002', 'BROCHURA', '1984', '978-002', 416, 1949, 'O Grande Irmão está de olho em você.', 50, 45.00, 'DISPONIVEL', 'edit-001');
+('book-002', 'BROCHURA', '1984', '978-002', 416, 1949, 'O Grande Irmão está de olho em você.', 50, 45.00, 'INDISPONIVEL', 'edit-001');
 
 -- 3. O Senhor dos Anéis (Digital)
 INSERT INTO livros (id, tipo_livro, titulo, isbn, num_paginas, ano_publicacao, resumo, quantidade_estoque, preco_base, status, editora_id) VALUES
-('book-003', 'DIGITAL', 'O Senhor dos Anéis', '978-003', 1200, 1954, 'Uma jornada épica pela Terra Média.', 1000, 39.90, 'DISPONIVEL', 'edit-002');
+('book-003', 'DIGITAL', 'O Senhor dos Anéis', '978-003', 1200, 1954, 'Uma jornada épica pela Terra Média.', 1000, 39.90, 'FORADECIRCULACAO', 'edit-002');
 
 -- 4. A Metamorfose (Capa Dura)
 INSERT INTO livros (id, tipo_livro, titulo, isbn, num_paginas, ano_publicacao, resumo, quantidade_estoque, preco_base, status, editora_id) VALUES

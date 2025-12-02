@@ -1,0 +1,67 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor white
+skinparam roundCorner 5
+skinparam linetype ortho
+
+title Diagrama de Classes - Efetuar Pedido (Com Testes Detalhados)
+
+package "tests" #E6F7FF {
+    class EfetuarPedidoServiceTest {
+        - service : EfetuarPedidoService
+        - pedidoRepository : PedidoRepository
+        - pagamentoRepository : PagamentoRepository
+        - manterClienteService : ManterClienteService
+        - manterLivroService : ManterLivroService
+        - pagamentoFactory : PagamentoFactory
+        - calculoFreteService : CalculoFreteService
+
+        .. Casos de Teste (CTs) ..
+        + ct01_FluxoPrincipal_Pix()
+        + ct02_FluxoAlternativo_Cartao3x()
+        + ct03_FluxoAlternativo_CartaoVista()
+        + ct04_FluxoExcecao_ClienteInvalido()
+        + ct05_FluxoExcecao_CepInvalido()
+        + ct06_FluxoExcecao_LivroInexistente()
+        + ct07_FluxoExcecao_EstoqueInsuficiente()
+
+        .. Helpers ..
+        - montarDto(...) : DadosPedidoDTO
+        - mockClienteExistente(id : String)
+        - mockLivroDisponivel(id : String) : Livro
+        - mockFrete(cep : String)
+        - mockSalvarPedido()
+    }
+}
+
+package "orderdomain.service" {
+    class EfetuarPedidoService {
+        + efetuarPedido(dados : DadosPedidoDTO) : Pedido
+    }
+}
+
+package "Mocks (Dependências)" #EEEEEE {
+    interface PedidoRepository
+    interface PagamentoRepository
+    class ManterClienteService
+    class ManterLivroService
+    class CalculoFreteService
+    class PagamentoFactory
+}
+
+
+EfetuarPedidoServiceTest --> EfetuarPedidoService : @InjectMocks (testa)
+
+EfetuarPedidoServiceTest ..> PedidoRepository : @Mock
+EfetuarPedidoServiceTest ..> PagamentoRepository : @Mock
+EfetuarPedidoServiceTest ..> ManterClienteService : @Mock
+EfetuarPedidoServiceTest ..> ManterLivroService : @Mock
+EfetuarPedidoServiceTest ..> PagamentoFactory : @Mock
+EfetuarPedidoServiceTest ..> CalculoFreteService : @Mock
+
+EfetuarPedidoService --> PedidoRepository
+EfetuarPedidoService --> ManterClienteService
+EfetuarPedidoService --> ManterLivroService
+
+@enduml

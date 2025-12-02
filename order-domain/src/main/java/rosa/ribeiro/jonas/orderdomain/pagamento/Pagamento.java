@@ -24,7 +24,7 @@ public abstract class Pagamento {
     private Pedido pedido;
 
     private BigDecimal valorOriginal;
-    private BigDecimal valorFinal; // Valor após desconto
+    private BigDecimal valorFinal;
 
     protected Pagamento() {}
 
